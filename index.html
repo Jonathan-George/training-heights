@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Assignment — Containerize the Capstone App</title>
+<title>Assignment â€” Containerize the Capstone App</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -153,23 +153,23 @@
 
   <header>
     <div class="kicker">Docker Certified Associate &middot; Cohort Training</div>
-    <div class="tag">Take-Home Assignment</div>
+    <div class="tag">Take-Home Assignment — CI/CD Updated</div>
   </header>
 
   <h1>Containerize the app with <em>your own</em> Dockerfiles + Compose</h1>
   <p class="goal">
     Using the repo you already cloned, write two Dockerfiles and one <code>docker-compose.yml</code>
-    to build and run the backend and frontend together — without copy-pasting from the session notes.
+    to build and run the backend and frontend together â€” without copy-pasting from the session notes.
   </p>
 
-  <p class="section-label">Before you write a single line — inspect the repo and identify:</p>
+  <p class="section-label">Before you write a single line â€” inspect the repo and identify:</p>
   <div class="checklist">
-    <div class="check"><span class="box"></span><span><b>Entry point</b> — <span class="dim">which file actually starts each app (check <code>package.json</code> &rarr; <code>"main"</code> / <code>"scripts"</code>)</span></span></div>
-    <div class="check"><span class="box"></span><span><b>Dependency file</b> — <span class="dim">confirm <code>package.json</code> exists in both <code>/server</code> and <code>/client</code></span></span></div>
-    <div class="check"><span class="box"></span><span><b>Listening port</b> — <span class="dim">find the port the backend code actually binds to (search for <code>listen(</code> in <code>server.js</code>)</span></span></div>
-    <div class="check"><span class="box"></span><span><b>Build output folder</b> — <span class="dim">check the frontend's build script to see what folder it outputs to (e.g. <code>dist</code> or <code>build</code>)</span></span></div>
-    <div class="check"><span class="box"></span><span><b>Env variables</b> — <span class="dim">look for a <code>.env</code> or <code>.env.example</code> file the app expects on startup</span></span></div>
-    <div class="check"><span class="box"></span><span><b>Data storage</b> — <span class="dim">identify where the backend writes persistent data, so you know what to mount as a volume</span></span></div>
+    <div class="check"><span class="box"></span><span><b>Entry point</b> â€” <span class="dim">which file actually starts each app (check <code>package.json</code> &rarr; <code>"main"</code> / <code>"scripts"</code>)</span></span></div>
+    <div class="check"><span class="box"></span><span><b>Dependency file</b> â€” <span class="dim">confirm <code>package.json</code> exists in both <code>/server</code> and <code>/client</code></span></span></div>
+    <div class="check"><span class="box"></span><span><b>Listening port</b> â€” <span class="dim">find the port the backend code actually binds to (search for <code>listen(</code> in <code>server.js</code>)</span></span></div>
+    <div class="check"><span class="box"></span><span><b>Build output folder</b> â€” <span class="dim">check the frontend's build script to see what folder it outputs to (e.g. <code>dist</code> or <code>build</code>)</span></span></div>
+    <div class="check"><span class="box"></span><span><b>Env variables</b> â€” <span class="dim">look for a <code>.env</code> or <code>.env.example</code> file the app expects on startup</span></span></div>
+    <div class="check"><span class="box"></span><span><b>Data storage</b> â€” <span class="dim">identify where the backend writes persistent data, so you know what to mount as a volume</span></span></div>
   </div>
 
   <div class="steps">
@@ -193,7 +193,7 @@
   <div class="footer">
     <p class="success">
       <strong>Success check:</strong> run <code>docker compose up --build</code> and load
-      <code>http://localhost:8080</code> in your browser — the app should load with zero manual steps.
+      <code>http://localhost:8080</code> in your browser â€” the app should load with zero manual steps.
     </p>
     <div class="due">Bring to next session<span>Working repo + screenshot</span></div>
   </div>
@@ -201,3 +201,4 @@
 </div>
 </body>
 </html>
+
