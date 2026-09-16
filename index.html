@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assignment — Containerize the Capstone App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #10151b;
+    --panel: #161d26;
+    --paper: #eef2f5;
+    --paper-dim: #8b96a3;
+    --teal: #35d0b0;
+    --teal-dim: #1d8f78;
+    --amber: #f2b34d;
+    --line: rgba(238,242,245,0.10);
+  }
+  *{ box-sizing: border-box; }
+  html, body{
+    margin:0; padding:0; height:100%;
+    background: var(--ink);
+    color: var(--paper);
+    font-family:'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .glow{
+    position: fixed; inset:0; overflow:hidden; z-index:0; pointer-events:none;
+  }
+  .glow::before{
+    content:"";
+    position:absolute; top:-20%; right:-10%;
+    width:50vw; height:50vw; max-width:700px; max-height:700px;
+    background: radial-gradient(circle, rgba(53,208,176,0.14) 0%, transparent 70%);
+  }
+  .slide{
+    position:relative; z-index:1;
+    min-height:100vh;
+    display:flex; flex-direction:column;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 48px 60px 40px;
+  }
+  header{
+    display:flex; justify-content:space-between; align-items:center;
+    padding-bottom:18px; margin-bottom:30px;
+    border-bottom:1px solid var(--line);
+  }
+  .kicker{
+    font-family:'IBM Plex Mono', monospace; font-size:0.72rem;
+    letter-spacing:0.18em; text-transform:uppercase;
+    color: var(--paper-dim);
+  }
+  .tag{
+    font-family:'IBM Plex Mono', monospace; font-size:0.68rem;
+    letter-spacing:0.1em; text-transform:uppercase;
+    color: var(--teal);
+    border:1px solid var(--teal-dim); border-radius:999px;
+    padding:6px 14px;
+  }
+  h1{
+    font-family:'Fraunces', serif; font-weight:700;
+    font-size: clamp(1.7rem, 3vw, 2.5rem);
+    line-height:1.14; margin:0 0 12px; max-width: 26ch;
+  }
+  h1 em{ color: var(--teal); font-style: italic; }
+
+  .goal{
+    font-size:0.98rem; line-height:1.55; color: var(--paper-dim);
+    max-width: 74ch; margin: 0 0 28px;
+  }
+
+  .section-label{
+    font-family:'IBM Plex Mono', monospace; font-size:0.68rem;
+    letter-spacing:0.14em; text-transform:uppercase;
+    color: var(--amber); margin: 0 0 12px;
+  }
+
+  .checklist{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 24px;
+    margin-bottom: 30px;
+  }
+  .check{
+    display:flex; gap:10px; align-items:flex-start;
+    font-size:0.85rem; line-height:1.5; color: var(--paper);
+  }
+  .check .box{
+    flex-shrink:0; margin-top:3px;
+    width:14px; height:14px; border-radius:3px;
+    border:1.5px solid var(--teal-dim);
+  }
+  .check b{ color: var(--paper); font-weight:600; }
+  .check span.dim{ color: var(--paper-dim); }
+
+  .steps{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .step{
+    background: var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding: 18px 18px 20px;
+  }
+  .step .n{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem; color: var(--teal);
+    letter-spacing:0.1em; margin-bottom:9px;
+  }
+  .step h3{
+    font-family:'Fraunces', serif; font-weight:600;
+    font-size:1rem; margin:0 0 7px;
+  }
+  .step p{
+    font-size:0.82rem; line-height:1.5; color:var(--paper-dim); margin:0;
+  }
+  .step code{
+    font-family:'IBM Plex Mono', monospace; font-size:0.78em;
+    background: rgba(53,208,176,0.1); color: var(--teal);
+    padding:1px 5px; border-radius:4px;
+  }
+
+  .footer{
+    margin-top: auto;
+    display:flex; justify-content:space-between; align-items:flex-end;
+    border-top:1px solid var(--line);
+    padding-top: 20px;
+  }
+  .success{
+    font-size:0.84rem; line-height:1.55; color: var(--paper); max-width: 56ch;
+  }
+  .success strong{ color: var(--teal); font-weight:500; }
+  .due{
+    text-align:right;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem; letter-spacing:0.08em;
+    color: var(--paper-dim); text-transform:uppercase;
+  }
+  .due span{ display:block; color: var(--amber); font-size:0.9rem; margin-top:4px; }
+</style>
+</head>
+<body>
+
+<div class="glow" aria-hidden="true"></div>
+
+<div class="slide">
+
+  <header>
+    <div class="kicker">Docker Certified Associate &middot; Cohort Training</div>
+    <div class="tag">Take-Home Assignment</div>
+  </header>
+
+  <h1>Containerize the app with <em>your own</em> Dockerfiles + Compose</h1>
+  <p class="goal">
+    Using the repo you already cloned, write two Dockerfiles and one <code>docker-compose.yml</code>
+    to build and run the backend and frontend together — without copy-pasting from the session notes.
+  </p>
+
+  <p class="section-label">Before you write a single line — inspect the repo and identify:</p>
+  <div class="checklist">
+    <div class="check"><span class="box"></span><span><b>Entry point</b> — <span class="dim">which file actually starts each app (check <code>package.json</code> &rarr; <code>"main"</code> / <code>"scripts"</code>)</span></span></div>
+    <div class="check"><span class="box"></span><span><b>Dependency file</b> — <span class="dim">confirm <code>package.json</code> exists in both <code>/server</code> and <code>/client</code></span></span></div>
+    <div class="check"><span class="box"></span><span><b>Listening port</b> — <span class="dim">find the port the backend code actually binds to (search for <code>listen(</code> in <code>server.js</code>)</span></span></div>
+    <div class="check"><span class="box"></span><span><b>Build output folder</b> — <span class="dim">check the frontend's build script to see what folder it outputs to (e.g. <code>dist</code> or <code>build</code>)</span></span></div>
+    <div class="check"><span class="box"></span><span><b>Env variables</b> — <span class="dim">look for a <code>.env</code> or <code>.env.example</code> file the app expects on startup</span></span></div>
+    <div class="check"><span class="box"></span><span><b>Data storage</b> — <span class="dim">identify where the backend writes persistent data, so you know what to mount as a volume</span></span></div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="n">01</div>
+      <h3>Backend Dockerfile</h3>
+      <p>Inside <code>/server</code>, write a <code>Dockerfile</code> that installs dependencies and starts the app on port <code>5000</code>.</p>
+    </div>
+    <div class="step">
+      <div class="n">02</div>
+      <h3>Frontend Dockerfile</h3>
+      <p>Inside <code>/client</code>, write a <code>Dockerfile</code> that builds the app, then serves the output with Nginx on port <code>80</code>.</p>
+    </div>
+    <div class="step">
+      <div class="n">03</div>
+      <h3>Compose File</h3>
+      <p>At the project root, write <code>docker-compose.yml</code> to build and connect both services, with a volume for backend data.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p class="success">
+      <strong>Success check:</strong> run <code>docker compose up --build</code> and load
+      <code>http://localhost:8080</code> in your browser — the app should load with zero manual steps.
+    </p>
+    <div class="due">Bring to next session<span>Working repo + screenshot</span></div>
+  </div>
+
+</div>
+</body>
+</html>
