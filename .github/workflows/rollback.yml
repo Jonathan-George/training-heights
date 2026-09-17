@@ -1,0 +1,114 @@
+name: Roll Back Production Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: "Existing release to restore, for example v1.0.0"
+        required: true
+        type: string
+      confirmation:
+        description: "Type ROLLBACK to confirm"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages-production
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    name: Restore previous production release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Validate rollback confirmation
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+          VERSION: ${{ inputs.release_version }}
+        run: |
+          if [ "$CONFIRMATION" != "ROLLBACK" ]; then
+            echo "::error::Confirmation must be exactly ROLLBACK"
+            exit 1
+          fi
+
+          if ! printf '%s' "$VERSION" |
+            grep --extended-regexp --quiet '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Release must follow the format v1.2.3"
+            exit 1
+          fi
+
+      - name: Download selected release package
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          VERSION: ${{ inputs.release_version }}
+        run: |
+          mkdir rollback-package
+
+          gh release download "$VERSION" \
+            --repo "$REPOSITORY" \
+            --pattern "training-night-pages-${VERSION}.zip" \
+            --pattern "training-night-pages-${VERSION}.zip.sha256" \
+            --dir rollback-package
+
+      - name: Verify release integrity
+        env:
+          VERSION: ${{ inputs.release_version }}
+        working-directory: rollback-package
+        run: |
+          sha256sum --check "training-night-pages-${VERSION}.zip.sha256"
+
+      - name: Extract rollback package
+        env:
+          VERSION: ${{ inputs.release_version }}
+        run: |
+          mkdir rollback-site
+
+          unzip \
+            "rollback-package/training-night-pages-${VERSION}.zip" \
+            -d rollback-site
+
+      - name: Upload rollback package to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: rollback-site
+
+      - name: Deploy selected release
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Verify restored website
+        env:
+          SITE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          curl \
+            --fail \
+            --location \
+            --silent \
+            --show-error \
+            --retry 5 \
+            --retry-delay 10 \
+            "$SITE_URL" |
+            grep --fixed-strings --quiet "Containerize the app"
+
+      - name: Create rollback summary
+        run: |
+          {
+            echo "## Production rollback completed"
+            echo ""
+            echo "- Restored release: ${{ inputs.release_version }}"
+            echo "- Initiated by: ${{ github.actor }}"
+            echo "- Website: ${{ steps.deployment.outputs.page_url }}"
+            echo "- Result: ${{ job.status }}"
+          } >> "$GITHUB_STEP_SUMMARY"

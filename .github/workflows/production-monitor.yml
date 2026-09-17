@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   availability:
@@ -15,13 +16,13 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Test HTTP response and expected content
+      - name: Test production website
+        id: monitor
+        continue-on-error: true
         env:
           SITE_URL: https://jonathan-george.github.io/training-night-pages/
           EXPECTED_TEXT: Containerize the app
         run: |
-          echo "Testing $SITE_URL"
-
           response_file="$(mktemp)"
 
           status_code="$(
@@ -40,16 +41,65 @@ jobs:
           echo "HTTP status: $status_code"
 
           if [ "$status_code" != "200" ]; then
-            echo "::error::Production returned HTTP $status_code"
+            echo "Production returned HTTP $status_code"
             exit 1
           fi
 
           if ! grep --fixed-strings --quiet "$EXPECTED_TEXT" "$response_file"; then
-            echo "::error::Production responded but expected content was missing"
+            echo "Expected production content was missing"
             exit 1
           fi
 
           echo "Production availability check passed"
+
+      - name: Open production incident
+        if: steps.monitor.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          existing_issue="$(
+            gh issue list \
+              --repo "$REPOSITORY" \
+              --state open \
+              --search '"Production availability incident" in:title' \
+              --json number \
+              --jq '.[0].number'
+          )"
+
+          if [ -z "$existing_issue" ]; then
+            gh issue create \
+              --repo "$REPOSITORY" \
+              --title "Production availability incident" \
+              --label "production-incident" \
+              --body "The automated production monitor failed. Investigate the workflow run: $RUN_URL"
+          else
+            gh issue comment "$existing_issue" \
+              --repo "$REPOSITORY" \
+              --body "Production monitoring failed again. Workflow run: $RUN_URL"
+          fi
+
+      - name: Close recovered incident
+        if: steps.monitor.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          existing_issue="$(
+            gh issue list \
+              --repo "$REPOSITORY" \
+              --state open \
+              --search '"Production availability incident" in:title' \
+              --json number \
+              --jq '.[0].number'
+          )"
+
+          if [ -n "$existing_issue" ]; then
+            gh issue close "$existing_issue" \
+              --repo "$REPOSITORY" \
+              --comment "Production has recovered. The automated availability check passed."
+          fi
 
       - name: Create monitoring summary
         if: always()
@@ -59,5 +109,11 @@ jobs:
             echo ""
             echo "- Website: https://jonathan-george.github.io/training-night-pages/"
             echo "- Checked at: $(date --utc --iso-8601=seconds)"
-            echo "- Workflow result: ${{ job.status }}"
+            echo "- Monitor result: ${{ steps.monitor.outcome }}"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail workflow when production is unavailable
+        if: steps.monitor.outcome == 'failure'
+        run: |
+          echo "::error::Production monitoring failed and an incident was created"
+          exit 1
