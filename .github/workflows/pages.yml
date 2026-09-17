@@ -54,15 +54,17 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-      - name: Scan repository for vulnerabilities and exposed secrets
-        uses: aquasecurity/trivy-action@0.36.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          scanners: vuln,secret,misconfig
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: "1"
+      - name: Scan repository for vulnerabilities, secrets and misconfigurations
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            aquasec/trivy:latest fs \
+            --scanners vuln,secret,misconfig \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --skip-dirs /workspace/.git \
+            --exit-code 1 \
+            /workspace
 
   deploy:
     name: Deploy to GitHub Pages
