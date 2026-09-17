@@ -1,0 +1,63 @@
+name: Production Availability Monitor
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  availability:
+    name: Check production availability
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Test HTTP response and expected content
+        env:
+          SITE_URL: https://jonathan-george.github.io/training-night-pages/
+          EXPECTED_TEXT: Containerize the app
+        run: |
+          echo "Testing $SITE_URL"
+
+          response_file="$(mktemp)"
+
+          status_code="$(
+            curl \
+              --location \
+              --silent \
+              --show-error \
+              --output "$response_file" \
+              --write-out "%{http_code}" \
+              --retry 3 \
+              --retry-delay 5 \
+              --max-time 30 \
+              "$SITE_URL"
+          )"
+
+          echo "HTTP status: $status_code"
+
+          if [ "$status_code" != "200" ]; then
+            echo "::error::Production returned HTTP $status_code"
+            exit 1
+          fi
+
+          if ! grep --fixed-strings --quiet "$EXPECTED_TEXT" "$response_file"; then
+            echo "::error::Production responded but expected content was missing"
+            exit 1
+          fi
+
+          echo "Production availability check passed"
+
+      - name: Create monitoring summary
+        if: always()
+        run: |
+          {
+            echo "## Production monitoring result"
+            echo ""
+            echo "- Website: https://jonathan-george.github.io/training-night-pages/"
+            echo "- Checked at: $(date --utc --iso-8601=seconds)"
+            echo "- Workflow result: ${{ job.status }}"
+          } >> "$GITHUB_STEP_SUMMARY"
