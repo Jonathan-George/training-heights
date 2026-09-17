@@ -1,4 +1,4 @@
-name: Validate and deploy GitHub Pages
+name: Advanced DevSecOps Pages Pipeline
 
 on:
   push:
@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
-    name: Validate site
+  quality:
+    name: Quality and accessibility gates
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -27,11 +27,47 @@ jobs:
           python-version: "3.12"
       - name: Validate HTML entry point
         run: python scripts/validate_site.py
+      - name: Lint HTML
+        run: npx --yes htmlhint@1.1.4 index.html
+      - name: Start test web server
+        run: python -m http.server 8080 > /tmp/training-night-site.log 2>&1 &
+      - name: Run accessibility audit
+        run: npx --yes pa11y-ci@3.1.0 --config .pa11yci.json
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --config lychee.toml index.html README.md
+          fail: true
+      - name: Upload tested site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tested-static-site
+          path: |
+            index.html
+            .nojekyll
+          if-no-files-found: error
+          retention-days: 14
+
+  security:
+    name: Filesystem security scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Scan repository for vulnerabilities and exposed secrets
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
 
   deploy:
     name: Deploy to GitHub Pages
     if: github.event_name != 'pull_request'
-    needs: validate
+    needs: [quality, security]
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -53,3 +89,21 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+  verify:
+    name: Post-deployment smoke test
+    if: github.event_name != 'pull_request'
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify live site responds and contains expected content
+        env:
+          SITE_URL: https://jonathan-george.github.io/training-night-pages/
+        run: |
+          for attempt in 1 2 3 4 5; do
+            page="$(curl --fail --silent --show-error --location "$SITE_URL")" && \
+              grep -q "Containerize the app" <<< "$page" && exit 0
+            echo "Attempt $attempt failed; retrying in 10 seconds"
+            sleep 10
+          done
+          echo "Live-site smoke test failed"
+          exit 1

@@ -1,0 +1,10 @@
+max_retries = 3
+retry_wait_time = 2
+timeout = 20
+exclude = [
+  "http://localhost:8000",
+  "http://localhost:8080",
+  "https://YOUR-USERNAME.github.io/training-night-pages/",
+  "https://github.com/YOUR-USERNAME/training-night-pages.git"
+]
+
