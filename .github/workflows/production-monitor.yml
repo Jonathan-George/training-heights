@@ -20,7 +20,7 @@ jobs:
         id: monitor
         continue-on-error: true
         env:
-          SITE_URL: https://jonathan-george.github.io/training-night-pages/
+          SITE_URL: https://jonathan-george.github.io/training-heights/
           EXPECTED_TEXT: Containerize the app
         run: |
           response_file="$(mktemp)"
@@ -107,7 +107,7 @@ jobs:
           {
             echo "## Production monitoring result"
             echo ""
-            echo "- Website: https://jonathan-george.github.io/training-night-pages/"
+            echo "- Website: https://jonathan-george.github.io/training-heights/"
             echo "- Checked at: $(date --utc --iso-8601=seconds)"
             echo "- Monitor result: ${{ steps.monitor.outcome }}"
           } >> "$GITHUB_STEP_SUMMARY"

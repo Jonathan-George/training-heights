@@ -1,6 +1,6 @@
-# Training Night — Advanced GitHub Pages DevSecOps Demo
+# Training Heights — Advanced GitHub Pages DevSecOps Demo
 
-[![Advanced DevSecOps Pages Pipeline](https://github.com/Jonathan-George/training-night-pages/actions/workflows/pages.yml/badge.svg)](https://github.com/Jonathan-George/training-night-pages/actions/workflows/pages.yml)
+[![Advanced DevSecOps Pages Pipeline](https://github.com/Jonathan-George/training-heights/actions/workflows/pages.yml/badge.svg)](https://github.com/Jonathan-George/training-heights/actions/workflows/pages.yml)
 
 This repository demonstrates an end-to-end deployment of a static HTML site:
 
@@ -14,14 +14,14 @@ This repository demonstrates an end-to-end deployment of a static HTML site:
 
 ## One-time setup
 
-Create an empty public repository named `training-night-pages` in your personal GitHub account. Do not initialize it with a README. Then open PowerShell in this extracted folder and run:
+Create an empty public repository named `training-heights` in your personal GitHub account. Do not initialize it with a README. Then open PowerShell in this extracted folder and run:
 
 ```powershell
 git init
 git add .
-git commit -m "Set up Training Night GitHub Pages CI/CD demo"
+git commit -m "Set up Training Heights GitHub Pages CI/CD demo"
 git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/training-night-pages.git
+git remote add origin https://github.com/YOUR-USERNAME/training-heights.git
 git push -u origin main
 ```
 
@@ -32,7 +32,7 @@ In the repository, open **Settings → Pages → Build and deployment**, set **S
 Your site URL will be:
 
 ```text
-https://YOUR-USERNAME.github.io/training-night-pages/
+https://YOUR-USERNAME.github.io/training-heights/
 ```
 
 ## Prove that push-to-live works
@@ -41,7 +41,7 @@ Change a visible phrase in `index.html`, save it, and run:
 
 ```powershell
 git add index.html
-git commit -m "Update the Training Night page"
+git commit -m "Update the Training Heights page"
 git push
 ```
 
