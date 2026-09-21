@@ -80,7 +80,7 @@ jobs:
             -d rollback-site
 
       - name: Upload rollback package to GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: rollback-site
 
