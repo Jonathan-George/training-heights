@@ -39,7 +39,7 @@ jobs:
           args: --config lychee.toml index.html README.md
           fail: true
       - name: Upload tested site artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tested-static-site
           path: |
