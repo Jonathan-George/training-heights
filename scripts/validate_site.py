@@ -1,4 +1,4 @@
-"""Dependency-free checks for the Training Night GitHub Pages site."""
+"""Dependency-free checks for the Training Heights GitHub Pages site."""
 
 from html.parser import HTMLParser
 from pathlib import Path

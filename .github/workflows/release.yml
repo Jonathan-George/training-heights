@@ -67,7 +67,7 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
         run: |
-          PACKAGE="training-night-pages-${VERSION}.zip"
+          PACKAGE="training-heights-${VERSION}.zip"
 
           zip "$PACKAGE" \
             index.html \
@@ -94,7 +94,7 @@ jobs:
             "$PACKAGE" \
             "${PACKAGE}.sha256" \
             --target "${{ github.sha }}" \
-            --title "Training Night ${VERSION}" \
+            --title "Training Heights ${VERSION}" \
             --notes "$RELEASE_NOTES"
 
       - name: Write release summary

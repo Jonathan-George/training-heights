@@ -99,7 +99,7 @@ jobs:
     steps:
       - name: Verify live site responds and contains expected content
         env:
-          SITE_URL: https://jonathan-george.github.io/training-night-pages/
+          SITE_URL: https://jonathan-george.github.io/training-heights/
         run: |
           for attempt in 1 2 3 4 5; do
             page="$(curl --fail --silent --show-error --location "$SITE_URL")" && \

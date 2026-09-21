@@ -4,7 +4,7 @@ timeout = 20
 exclude = [
   "http://localhost:8000",
   "http://localhost:8080",
-  "https://YOUR-USERNAME.github.io/training-night-pages/",
-  "https://github.com/YOUR-USERNAME/training-night-pages.git"
+  "https://YOUR-USERNAME.github.io/training-heights/",
+  "https://github.com/YOUR-USERNAME/training-heights.git"
 ]
 
