@@ -14,7 +14,8 @@ on:
 
 permissions:
   contents: write
-
+  id-token: write
+  attestations: write
 jobs:
   release:
     name: Validate, package and release
@@ -77,6 +78,11 @@ jobs:
           sha256sum "$PACKAGE" > "${PACKAGE}.sha256"
 
           echo "PACKAGE=$PACKAGE" >> "$GITHUB_ENV"
+
+      - name: Attest release package
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ${{ env.PACKAGE }}
 
       - name: Create GitHub release
         env:
